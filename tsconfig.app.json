@@ -6,11 +6,12 @@
     "module": "ESNext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "ignoreDeprecations": "6.0",
+
 
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

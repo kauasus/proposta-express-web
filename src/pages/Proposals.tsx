@@ -1,7 +1,7 @@
 import type { ProposalStatus } from '@/@types'
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
+import { ProposalCardSkeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { StatusBadge } from '@/components/shared/StatusBadge'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ import { Inbox, MoreVertical, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { motion } from 'framer-motion'
 
 export const ProposalsPage = () => {
   const { proposals, isLoading, fetchProposals, deleteProposal, sendProposal } = useProposals()
@@ -48,27 +49,60 @@ export const ProposalsPage = () => {
     toast.success('Proposta enviada com sucesso')
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.05, delayChildren: 0.1 },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  }
+
   return (
     <div className='space-y-6'>
       <PageHeader
         title='Propostas'
         description='Acompanhe o status e o desempenho das propostas enviadas em uma visualização clara e responsiva.'
-        actionLabel='Nova proposta'
-        actionIcon={Plus}
-        onAction={() => navigate('/proposals/new')}
+        action={
+          <Button onClick={() => navigate('/proposals/new')} size='sm' className='text-xs sm:text-sm'>
+            <Plus className='h-3.5 w-3.5 sm:h-4 sm:w-4' />
+            Nova proposta
+          </Button>
+        }
       />
 
-      <Tabs defaultValue='all' value={filter} onValueChange={(value) => setFilter(value as 'all' | ProposalStatus)}>
-        <TabsList>
-          <TabsTrigger value='all'>Todas</TabsTrigger>
-          <TabsTrigger value='draft'>Rascunhos</TabsTrigger>
-          <TabsTrigger value='sent'>Enviadas</TabsTrigger>
-          <TabsTrigger value='accepted'>Aceitas</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+        <Tabs
+          defaultValue='all'
+          value={filter}
+          onValueChange={(value) => setFilter(value as 'all' | ProposalStatus)}
+        >
+          <TabsList className='h-auto p-1'>
+            <TabsTrigger value='all'>Todas</TabsTrigger>
+            <TabsTrigger value='draft'>Rascunhos</TabsTrigger>
+            <TabsTrigger value='sent'>Enviadas</TabsTrigger>
+            <TabsTrigger value='accepted'>Aceitas</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </motion.div>
 
       {isLoading ? (
-        <LoadingSkeleton rows={5} />
+        <motion.div
+          variants={containerVariants}
+          initial='hidden'
+          animate='visible'
+          className='space-y-3'
+        >
+          {Array.from({ length: 5 }).map((_, i) => (
+            <motion.div key={i} variants={itemVariants}>
+              <ProposalCardSkeleton />
+            </motion.div>
+          ))}
+        </motion.div>
       ) : filteredProposals.length === 0 ? (
         <EmptyState
           icon={Inbox}
@@ -78,50 +112,57 @@ export const ProposalsPage = () => {
           onCtaClick={() => navigate('/proposals/new')}
         />
       ) : (
-        <Table className='min-w-[880px]'>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Título</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Validade</TableHead>
-              <TableHead>Total</TableHead>
-              <TableHead className='text-right'>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProposals.map((proposal) => (
-              <TableRow key={proposal.id}>
-                <TableCell className='font-medium text-foreground'>{proposal.title}</TableCell>
-                <TableCell>
-                  <StatusBadge status={proposal.status} />
-                </TableCell>
-                <TableCell>{formatDate(proposal.validUntil)}</TableCell>
-                <TableCell>{formatCurrencyBRL(proposal.total)}</TableCell>
-                <TableCell className='text-right'>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant='outline' size='sm'>
-                        <MoreVertical className='h-4 w-4' />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align='end'>
-                      <DropdownMenuItem onClick={() => navigate(`/proposals/${proposal.id}`)}>
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleSend(proposal.id)}>Enviar</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => window.open(`/v/${proposal.publicToken}`, '_blank')}>
-                        Link público
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className='text-destructive' onClick={() => setProposalIdToDelete(proposal.id)}>
-                        Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <motion.div
+          variants={containerVariants}
+          initial='hidden'
+          animate='visible'
+          className='overflow-x-auto rounded-xl sm:rounded-2xl border border-border/40'
+        >
+          <Table className='min-w-[600px] sm:min-w-full'>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Título</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Validade</TableHead>
+                <TableHead>Total</TableHead>
+                <TableHead className='text-right'>Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredProposals.map((proposal) => (
+                <TableRow key={proposal.id}>
+                  <TableCell className='font-medium text-foreground'>{proposal.title}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={proposal.status} />
+                  </TableCell>
+                  <TableCell>{formatDate(proposal.validUntil)}</TableCell>
+                  <TableCell>{formatCurrencyBRL(proposal.total)}</TableCell>
+                  <TableCell className='text-right'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='outline' size='sm'>
+                          <MoreVertical className='h-4 w-4' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end'>
+                        <DropdownMenuItem onClick={() => navigate(`/proposals/${proposal.id}`)}>
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleSend(proposal.id)}>Enviar</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => window.open(`/v/${proposal.publicToken}`, '_blank')}>
+                          Link público
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='text-destructive' onClick={() => setProposalIdToDelete(proposal.id)}>
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </motion.div>
       )}
 
       <ConfirmDialog
