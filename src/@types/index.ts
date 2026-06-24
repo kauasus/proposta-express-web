@@ -1,9 +1,16 @@
-export type ProposalStatus = 'draft' | 'sent' | 'viewed' | 'accepted' | 'rejected'
+export type ProposalStatus =
+  | 'draft'
+  | 'sent'
+  | 'viewed'
+  | 'accepted'
+  | 'rejected'
 
 export interface User {
   id: string
   name: string
   email: string
+  role: string
+  companyId: string
 }
 
 export interface AuthResponse {
@@ -16,6 +23,14 @@ export interface Client {
   name: string
   email: string
   phone: string
+  companyId: string
+  otherPhone?: string
+  identification?: string
+  streetNumber?: string
+  sublocality?: string
+  city?: string
+  state?: string
+  country?: string
   secondaryPhone: string
   document: string
   zipCode: string

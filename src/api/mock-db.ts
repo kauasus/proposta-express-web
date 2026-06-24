@@ -7,7 +7,7 @@ const STORAGE_KEYS = {
   proposals: 'pe.proposals',
 }
 
-const read = <T,>(key: string, fallback: T): T => {
+const read = <T>(key: string, fallback: T): T => {
   const raw = localStorage.getItem(key)
   if (!raw) return fallback
   try {
@@ -17,15 +17,25 @@ const read = <T,>(key: string, fallback: T): T => {
   }
 }
 
-const write = <T,>(key: string, value: T): void => {
+const write = <T>(key: string, value: T): void => {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
-const normalizeClient = (client: Partial<Client> & { id: string; createdAt?: string }): Client => ({
+const normalizeClient = (
+  client: Partial<Client> & { id: string; createdAt?: string },
+): Client => ({
   id: client.id,
   name: client.name ?? '',
   email: client.email ?? '',
   phone: client.phone ?? '',
+  companyId: client.companyId ?? '',
+  otherPhone: client.otherPhone ?? client.secondaryPhone ?? '',
+  identification: client.identification ?? client.document ?? '',
+  streetNumber: client.streetNumber ?? client.addressNumber ?? '',
+  sublocality: client.sublocality ?? '',
+  city: client.city ?? '',
+  state: client.state ?? '',
+  country: client.country ?? '',
   secondaryPhone: client.secondaryPhone ?? '',
   document: client.document ?? '',
   zipCode: client.zipCode ?? '',
@@ -37,15 +47,29 @@ const normalizeClient = (client: Partial<Client> & { id: string; createdAt?: str
 export const mockDb = {
   getUsers: (): User[] => read<User[]>(STORAGE_KEYS.users, []),
   saveUsers: (users: User[]): void => write(STORAGE_KEYS.users, users),
-  getClients: (): Client[] => read<Client[]>(STORAGE_KEYS.clients, []).map((client) => normalizeClient(client)),
-  saveClients: (clients: Client[]): void => write(STORAGE_KEYS.clients, clients.map((client) => normalizeClient(client))),
+  getClients: (): Client[] =>
+    read<Client[]>(STORAGE_KEYS.clients, []).map((client) =>
+      normalizeClient(client),
+    ),
+  saveClients: (clients: Client[]): void =>
+    write(
+      STORAGE_KEYS.clients,
+      clients.map((client) => normalizeClient(client)),
+    ),
   getProposals: (): Proposal[] => read<Proposal[]>(STORAGE_KEYS.proposals, []),
-  saveProposals: (proposals: Proposal[]): void => write(STORAGE_KEYS.proposals, proposals),
+  saveProposals: (proposals: Proposal[]): void =>
+    write(STORAGE_KEYS.proposals, proposals),
   seed: (): void => {
     const users = mockDb.getUsers()
     if (users.length === 0) {
       mockDb.saveUsers([
-        { id: crypto.randomUUID(), name: 'Admin Proposta Express', email: 'admin@proposta.express' },
+        {
+          id: crypto.randomUUID(),
+          name: 'Admin Proposta Express',
+          email: 'admin@proposta.express',
+          role: 'SUPERADMIN',
+          companyId: crypto.randomUUID(),
+        },
       ])
     }
 
@@ -57,11 +81,15 @@ export const mockDb = {
           name: 'Empresa Exemplo LTDA',
           email: 'contato@empresaexemplo.com.br',
           phone: '(11) 98888-7777',
+          companyId: crypto.randomUUID(),
           secondaryPhone: '(11) 97777-6666',
+          otherPhone: '(11) 97777-6666',
           document: '12.345.678/0001-90',
+          identification: '12.345.678/0001-90',
           zipCode: '01310-200',
           address: 'Av. Paulista',
           addressNumber: '1000',
+          streetNumber: '1000',
           createdAt: nowIso(),
         },
       ])
@@ -82,8 +110,18 @@ export const mockDb = {
             notes: 'Entrega em 30 dias úteis',
             publicToken: crypto.randomUUID(),
             items: [
-              { id: crypto.randomUUID(), description: 'Desenvolvimento Frontend', quantity: 1, unitPrice: 3000 },
-              { id: crypto.randomUUID(), description: 'Integração API', quantity: 1, unitPrice: 2000 },
+              {
+                id: crypto.randomUUID(),
+                description: 'Desenvolvimento Frontend',
+                quantity: 1,
+                unitPrice: 3000,
+              },
+              {
+                id: crypto.randomUUID(),
+                description: 'Integração API',
+                quantity: 1,
+                unitPrice: 2000,
+              },
             ],
             subtotal,
             discount: 0,

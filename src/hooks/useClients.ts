@@ -8,5 +8,12 @@ export const useClients = () => {
   const updateClient = useProposalStore((state) => state.updateClient)
   const removeClient = useProposalStore((state) => state.removeClient)
 
-  return { clients, isLoading, fetchClients, createClient, updateClient, removeClient }
+  return {
+    clients,
+    isLoading,
+    fetchClients,
+    createClient,
+    updateClient,
+    removeClient,
+  }
 }

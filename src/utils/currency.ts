@@ -5,7 +5,10 @@ export const formatCurrencyBRL = (value: number): string =>
   }).format(value)
 
 export const parseCurrencyToNumber = (value: string): number => {
-  const normalized = value.replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '')
+  const normalized = value
+    .replace(/\./g, '')
+    .replace(',', '.')
+    .replace(/[^\d.-]/g, '')
   const parsed = Number(normalized)
   return Number.isNaN(parsed) ? 0 : parsed
 }

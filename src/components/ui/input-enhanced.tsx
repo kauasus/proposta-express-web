@@ -18,16 +18,23 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, success, helperText, icon, className, ...props }, ref) => {
-    const MotionInput = motion.input as unknown as React.ForwardRefExoticComponent<
-      MotionInputProps & React.RefAttributes<HTMLInputElement>
-    >
+    const MotionInput =
+      motion.input as unknown as React.ForwardRefExoticComponent<
+        MotionInputProps & React.RefAttributes<HTMLInputElement>
+      >
 
     return (
-      <div className='space-y-2 w-full'>
-        {label && <label className='text-sm font-medium text-foreground'>{label}</label>}
+      <div className="space-y-2 w-full">
+        {label && (
+          <label className="text-sm font-medium text-foreground">{label}</label>
+        )}
 
-        <div className='relative'>
-          {icon && <div className='absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'>{icon}</div>}
+        <div className="relative">
+          {icon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              {icon}
+            </div>
+          )}
 
           <MotionInput
             ref={ref}
@@ -51,9 +58,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500'
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500"
               >
-                <CheckCircle className='h-5 w-5' />
+                <CheckCircle className="h-5 w-5" />
               </motion.div>
             )}
             {error && (
@@ -61,9 +68,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className='absolute right-3 top-1/2 -translate-y-1/2 text-destructive'
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-destructive"
               >
-                <AlertCircle className='h-5 w-5' />
+                <AlertCircle className="h-5 w-5" />
               </motion.div>
             )}
           </AnimatePresence>
@@ -80,9 +87,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 error ? 'text-destructive/90' : 'text-muted-foreground'
               }`}
             >
-              {error && <AlertCircle className='h-3.5 w-3.5' />}
+              {error && <AlertCircle className="h-3.5 w-3.5" />}
               {error && <span>{error}</span>}
-              {!error && helperText && <Info className='h-3.5 w-3.5' />}
+              {!error && helperText && <Info className="h-3.5 w-3.5" />}
               {!error && helperText && <span>{helperText}</span>}
             </motion.div>
           )}

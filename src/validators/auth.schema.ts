@@ -1,16 +1,19 @@
 import { z } from 'zod'
 
 export const loginSchema = z.object({
-  email: z.string().email('E-mail inválido'),
-  password: z.string().min(6, 'A senha deve ter ao menos 6 caracteres'),
+  email: z.string().min(1, 'Digite seu e-mail').email('E-mail inválido'),
+  password: z.string().min(4, 'A senha precisa ter pelo menos 4 caracteres'),
 })
 
 export const registerSchema = z
   .object({
-    name: z.string().min(3, 'Nome obrigatório'),
-    email: z.string().email('E-mail inválido'),
-    password: z.string().min(6, 'A senha deve ter ao menos 6 caracteres'),
-    confirmPassword: z.string().min(6),
+    name: z
+      .string()
+      .min(4, 'Nome completo precisa ter pelo menos 4 caracteres'),
+    email: z.string().min(1, 'Digite seu e-mail').email('E-mail inválido'),
+    password: z.string().min(4, 'A senha precisa ter pelo menos 4 caracteres'),
+    confirmPassword: z.string().min(4, 'Confirme sua senha'),
+    companyId: z.string().uuid('Identificador da empresa inválido'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'As senhas não conferem',

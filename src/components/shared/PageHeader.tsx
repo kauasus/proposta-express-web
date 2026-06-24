@@ -12,12 +12,19 @@ interface PageHeaderProps {
   onAction?: () => void
 }
 
-export function PageHeader({ title, description, action, actionLabel, actionIcon: ActionIcon, onAction }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  action,
+  actionLabel,
+  actionIcon: ActionIcon,
+  onAction,
+}: PageHeaderProps) {
   const resolvedAction =
     action ??
     (actionLabel && onAction ? (
       <Button onClick={onAction}>
-        {ActionIcon ? <ActionIcon className='h-4 w-4' /> : null}
+        {ActionIcon ? <ActionIcon className="h-4 w-4" /> : null}
         {actionLabel}
       </Button>
     ) : null)
@@ -27,15 +34,15 @@ export function PageHeader({ title, description, action, actionLabel, actionIcon
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-2'
+      className="space-y-2"
     >
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
-        <div className='flex-1'>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex-1">
           <motion.h1
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
-            className='text-3xl sm:text-4xl font-bold tracking-tight text-foreground'
+            className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground"
           >
             {title}
           </motion.h1>
@@ -44,7 +51,7 @@ export function PageHeader({ title, description, action, actionLabel, actionIcon
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.15, duration: 0.3 }}
-              className='mt-2 text-base text-muted-foreground'
+              className="mt-2 text-base text-muted-foreground"
             >
               {description}
             </motion.p>

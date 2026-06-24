@@ -28,16 +28,18 @@ export const ConfirmDialog = ({
   onCancel,
 }: ConfirmDialogProps) => (
   <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onCancel()}>
-    <DialogContent className='sm:max-w-md'>
+    <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle className='font-display text-xl'>{title}</DialogTitle>
-        <DialogDescription className='text-sm leading-6 text-muted-foreground'>{description}</DialogDescription>
+        <DialogTitle className="font-display text-xl">{title}</DialogTitle>
+        <DialogDescription className="text-sm leading-6 text-muted-foreground">
+          {description}
+        </DialogDescription>
       </DialogHeader>
       <DialogFooter>
-        <Button variant='outline' onClick={onCancel}>
+        <Button variant="outline" onClick={onCancel}>
           {cancelLabel}
         </Button>
-        <Button variant='destructive' onClick={onConfirm}>
+        <Button variant="destructive" onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </DialogFooter>

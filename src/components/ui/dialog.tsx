@@ -8,11 +8,24 @@ export const DialogTrigger = DialogPrimitive.Trigger
 export const DialogPortal = DialogPrimitive.Portal
 export const DialogClose = DialogPrimitive.Close
 
-export const DialogOverlay = ({ className, ...props }: DialogPrimitive.DialogOverlayProps) => (
-  <DialogPrimitive.Overlay className={cn('fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm', className)} {...props} />
+export const DialogOverlay = ({
+  className,
+  ...props
+}: DialogPrimitive.DialogOverlayProps) => (
+  <DialogPrimitive.Overlay
+    className={cn(
+      'fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm',
+      className,
+    )}
+    {...props}
+  />
 )
 
-export const DialogContent = ({ className, children, ...props }: DialogPrimitive.DialogContentProps) => (
+export const DialogContent = ({
+  className,
+  children,
+  ...props
+}: DialogPrimitive.DialogContentProps) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -23,18 +36,24 @@ export const DialogContent = ({ className, children, ...props }: DialogPrimitive
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className='absolute right-4 top-4 rounded-full p-1 text-muted-foreground/80 transition hover:bg-muted hover:text-foreground'>
-        <X className='h-4 w-4' />
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-full p-1 text-muted-foreground/80 transition hover:bg-muted hover:text-foreground">
+        <X className="h-4 w-4" />
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
 )
 
-export const DialogHeader = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const DialogHeader = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('flex flex-col space-y-1.5', className)} {...props} />
 )
 
-export const DialogFooter = ({ className, ...props }: HTMLAttributes<HTMLDivElement>) => (
+export const DialogFooter = ({
+  className,
+  ...props
+}: HTMLAttributes<HTMLDivElement>) => (
   <div className={cn('mt-4 flex justify-end gap-2', className)} {...props} />
 )
 

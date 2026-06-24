@@ -1,7 +1,13 @@
 import type { ProposalStatus } from '@/@types'
 import { Badge } from '@/components/ui/badge'
 
-const statusMap: Record<ProposalStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
+const statusMap: Record<
+  ProposalStatus,
+  {
+    label: string
+    variant: 'default' | 'secondary' | 'destructive' | 'outline'
+  }
+> = {
   draft: { label: 'Rascunho', variant: 'outline' },
   sent: { label: 'Enviada', variant: 'default' },
   viewed: { label: 'Visualizada', variant: 'secondary' },

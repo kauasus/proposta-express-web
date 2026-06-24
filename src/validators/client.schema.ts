@@ -1,17 +1,19 @@
 import { z } from 'zod'
 
-const phoneRegex = /^\(\d{2}\)\s\d{4,5}-\d{4}$/
-const cepRegex = /^\d{5}-\d{3}$/
-
 export const clientSchema = z.object({
-  name: z.string().min(3, 'Nome obrigatório'),
-  email: z.string().email('E-mail inválido'),
-  phone: z.string().regex(phoneRegex, 'Telefone inválido'),
-  secondaryPhone: z.string().regex(/^$|^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Telefone alternativo inválido'),
-  document: z.string().min(14, 'CPF/CNPJ inválido'),
-  zipCode: z.string().regex(cepRegex, 'CEP inválido'),
-  address: z.string().min(3, 'Endereço obrigatório'),
-  addressNumber: z.string().min(1, 'Número obrigatório').regex(/^\d+$/, 'Número inválido'),
+  name: z.string().min(4, 'Nome completo precisa ter pelo menos 4 caracteres'),
+  email: z.string().min(1, 'Digite o e-mail').email('E-mail inválido'),
+  phone: z.string().min(8, 'Telefone precisa ter pelo menos 8 dígitos'),
+  companyId: z.string().uuid('Identificador da empresa inválido'),
+  otherPhone: z.string().optional(),
+  identification: z.string().optional(),
+  zipCode: z.string().optional(),
+  address: z.string().optional(),
+  streetNumber: z.string().optional(),
+  sublocality: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  country: z.string().optional(),
 })
 
 export type ClientInput = z.infer<typeof clientSchema>

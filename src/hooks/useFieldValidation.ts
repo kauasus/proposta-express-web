@@ -48,7 +48,7 @@ export const validationRules = {
   }),
   email: (): ValidationRule => ({
     validate: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-    message: 'Email inválido',
+    message: 'E-mail inválido',
   }),
   phone: (): ValidationRule => ({
     validate: (v) => /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/.test(v),

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useAuth } from '@/hooks/useAuth'
 import { useClients } from '@/hooks/useClients'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Inbox, Pencil, Plus, Trash2 } from 'lucide-react'
@@ -54,11 +55,16 @@ const emptyClientValues: ClientInput = {
   name: '',
   email: '',
   phone: '',
-  secondaryPhone: '',
-  document: '',
+  companyId: '',
+  otherPhone: '',
+  identification: '',
   zipCode: '',
   address: '',
-  addressNumber: '',
+  streetNumber: '',
+  sublocality: '',
+  city: '',
+  state: '',
+  country: '',
 }
 
 const toClientFormValues = (client?: Partial<Client>): ClientInput => ({
@@ -66,15 +72,21 @@ const toClientFormValues = (client?: Partial<Client>): ClientInput => ({
   name: client?.name ?? '',
   email: client?.email ?? '',
   phone: client?.phone ?? '',
-  secondaryPhone: client?.secondaryPhone ?? '',
-  document: client?.document ?? '',
+  companyId: client?.companyId ?? '',
+  otherPhone: client?.otherPhone ?? client?.secondaryPhone ?? '',
+  identification: client?.identification ?? client?.document ?? '',
   zipCode: client?.zipCode ?? '',
   address: client?.address ?? '',
-  addressNumber: client?.addressNumber ?? '',
+  streetNumber: client?.streetNumber ?? client?.addressNumber ?? '',
+  sublocality: client?.sublocality ?? '',
+  city: client?.city ?? '',
+  state: client?.state ?? '',
+  country: client?.country ?? '',
 })
 
 export const ClientsPage = () => {
   const { clients, isLoading, fetchClients, createClient, updateClient, removeClient } = useClients()
+  const { user } = useAuth()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
@@ -90,7 +102,7 @@ export const ClientsPage = () => {
 
   const openCreateModal = () => {
     setEditingClient(null)
-    form.reset(emptyClientValues)
+    form.reset({ ...emptyClientValues, companyId: user?.companyId ?? '' })
     setIsModalOpen(true)
   }
 
@@ -107,7 +119,7 @@ export const ClientsPage = () => {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
       if (!response.ok) {
-        throw new Error('Não foi possível consultar o CEP')
+        throw new Error('Não conseguimos encontrar esse CEP')
       }
 
       const data = (await response.json()) as { erro?: boolean; logradouro?: string }
@@ -120,7 +132,7 @@ export const ClientsPage = () => {
       form.clearErrors('zipCode')
       form.setValue('address', data.logradouro ?? '', { shouldDirty: true, shouldValidate: true })
     } catch {
-      toast.error('Não foi possível preencher o endereço pelo CEP')
+      toast.error('Não conseguimos preencher o endereço com esse CEP')
     }
   }
 
@@ -135,7 +147,7 @@ export const ClientsPage = () => {
       }
       setIsModalOpen(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao salvar cliente')
+      toast.error(error instanceof Error ? error.message : 'Não conseguimos salvar o cliente. Tente novamente.')
     }
   }
 
@@ -146,7 +158,7 @@ export const ClientsPage = () => {
       toast.success('Cliente removido com sucesso')
       setClientToDelete(null)
     } catch {
-      toast.error('Erro ao remover cliente')
+      toast.error('Não conseguimos remover o cliente. Tente novamente.')
     }
   }
 
@@ -154,7 +166,7 @@ export const ClientsPage = () => {
     <div className='space-y-6'>
       <PageHeader
         title='Clientes'
-        description='Organize dados de contato, documentação e endereço com uma interface pronta para uso no mobile.'
+        description='Mantenha seus contatos organizados e pronto para criar propostas.'
         actionLabel='Novo cliente'
         actionIcon={Plus}
         onAction={openCreateModal}
@@ -166,7 +178,7 @@ export const ClientsPage = () => {
         <EmptyState
           icon={Inbox}
           title='Nenhum cliente cadastrado'
-          description='Comece adicionando seu primeiro cliente para criar propostas rapidamente.'
+          description='Crie seu primeiro cliente para começar a fazer propostas.'
           ctaLabel='Cadastrar cliente'
           onCtaClick={openCreateModal}
         />
@@ -189,10 +201,12 @@ export const ClientsPage = () => {
                 <TableCell>
                   <div className='flex flex-col'>
                     <span>{client.phone}</span>
-                    {client.secondaryPhone ? <span className='text-xs text-muted-foreground'>{client.secondaryPhone}</span> : null}
+                    {client.otherPhone || client.secondaryPhone ? (
+                      <span className='text-xs text-muted-foreground'>{client.otherPhone ?? client.secondaryPhone}</span>
+                    ) : null}
                   </div>
                 </TableCell>
-                <TableCell>{client.document}</TableCell>
+                <TableCell>{client.identification ?? client.document}</TableCell>
                 <TableCell className='text-right'>
                   <div className='flex justify-end gap-2'>
                     <Button variant='outline' size='sm' onClick={() => openEditModal(client)}>
@@ -233,6 +247,16 @@ export const ClientsPage = () => {
 
             <div className='grid gap-4 md:grid-cols-2'>
               <div className='space-y-2'>
+                <Label>ID da empresa</Label>
+                <Input
+                  className='font-mono text-xs'
+                  placeholder='00000000-0000-0000-0000-000000000000'
+                  readOnly
+                  {...form.register('companyId')}
+                />
+                <p className='text-xs text-muted-foreground'>Preenchido automaticamente com sua empresa</p>
+              </div>
+              <div className='space-y-2'>
                 <Label>Telefone principal</Label>
                 <Controller
                   control={form.control}
@@ -254,7 +278,7 @@ export const ClientsPage = () => {
                 <Label>Telefone secundário</Label>
                 <Controller
                   control={form.control}
-                  name='secondaryPhone'
+                  name='otherPhone'
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
@@ -266,7 +290,7 @@ export const ClientsPage = () => {
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.secondaryPhone?.message}</p>
+                <p className='text-xs text-destructive'>{form.formState.errors.otherPhone?.message}</p>
               </div>
             </div>
 
@@ -275,7 +299,7 @@ export const ClientsPage = () => {
                 <Label>CPF/CNPJ</Label>
                 <Controller
                   control={form.control}
-                  name='document'
+                  name='identification'
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
@@ -287,7 +311,7 @@ export const ClientsPage = () => {
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.document?.message}</p>
+                <p className='text-xs text-destructive'>{form.formState.errors.identification?.message}</p>
               </div>
               <div className='space-y-2'>
                 <Label>CEP</Label>
@@ -302,7 +326,7 @@ export const ClientsPage = () => {
                       value={field.value}
                       onBlur={async () => {
                         field.onBlur()
-                        await lookupZipCode(field.value)
+                        await lookupZipCode(field.value ?? '')
                       }}
                       onChange={(event) => {
                         const nextValue = formatZipCode(event.target.value)
@@ -329,9 +353,9 @@ export const ClientsPage = () => {
                 <Input
                   inputMode='numeric'
                   placeholder='123'
-                  {...form.register('addressNumber', { setValueAs: (value) => onlyDigits(String(value)) })}
+                  {...form.register('streetNumber', { setValueAs: (value) => onlyDigits(String(value)) })}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.addressNumber?.message}</p>
+                <p className='text-xs text-destructive'>{form.formState.errors.streetNumber?.message}</p>
               </div>
             </div>
 

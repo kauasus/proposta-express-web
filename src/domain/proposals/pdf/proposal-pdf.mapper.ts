@@ -1,4 +1,7 @@
-import type { ProposalPdfBranding, ProposalPdfDocumentData } from './proposal-pdf.types'
+import type {
+  ProposalPdfBranding,
+  ProposalPdfDocumentData,
+} from './proposal-pdf.types'
 
 const stripControlCharacters = (value: string) =>
   value
@@ -9,7 +12,11 @@ const stripControlCharacters = (value: string) =>
     })
     .join('')
 
-export const sanitizePdfText = (value: unknown, fallback = '', maxLength = 240) => {
+export const sanitizePdfText = (
+  value: unknown,
+  fallback = '',
+  maxLength = 240,
+) => {
   const safeValue = stripControlCharacters(String(value ?? fallback))
     .replace(/\s+/g, ' ')
     .trim()
@@ -53,17 +60,33 @@ export const defaultProposalPdfBranding: ProposalPdfBranding = {
   ],
   paymentTerms: '50% na aprovação e 50% na entrega final.',
   deliveryEstimate: 'Conforme o escopo validado em reunião.',
-  confidentialityNote: 'Esta proposta é confidencial e destinada exclusivamente ao cliente informado.',
-  guaranteeNote: 'Garantia de ajuste fino após a entrega, conforme o escopo contratado.',
+  confidentialityNote:
+    'Esta proposta é confidencial e destinada exclusivamente ao cliente informado.',
+  guaranteeNote:
+    'Garantia de ajuste fino após a entrega, conforme o escopo contratado.',
   signatureName: 'Seu nome',
   signatureRole: 'Consultor Comercial',
 }
 
-export const normalizeProposalPdfBranding = (branding: Partial<ProposalPdfBranding>): ProposalPdfBranding => ({
-  brandName: sanitizePdfText(branding.brandName, defaultProposalPdfBranding.brandName, 80),
-  legalName: sanitizePdfText(branding.legalName, defaultProposalPdfBranding.legalName, 120),
+export const normalizeProposalPdfBranding = (
+  branding: Partial<ProposalPdfBranding>,
+): ProposalPdfBranding => ({
+  brandName: sanitizePdfText(
+    branding.brandName,
+    defaultProposalPdfBranding.brandName,
+    80,
+  ),
+  legalName: sanitizePdfText(
+    branding.legalName,
+    defaultProposalPdfBranding.legalName,
+    120,
+  ),
   logoUrl: sanitizePdfUrl(branding.logoUrl) ?? '',
-  slogan: sanitizePdfText(branding.slogan, defaultProposalPdfBranding.slogan, 140),
+  slogan: sanitizePdfText(
+    branding.slogan,
+    defaultProposalPdfBranding.slogan,
+    140,
+  ),
   cnpj: sanitizePdfText(branding.cnpj, '', 30),
   email: sanitizePdfText(branding.email, '', 120),
   phone: sanitizePdfText(branding.phone, '', 30),
@@ -71,23 +94,57 @@ export const normalizeProposalPdfBranding = (branding: Partial<ProposalPdfBrandi
   address: sanitizePdfText(branding.address, '', 140),
   cityState: sanitizePdfText(branding.cityState, '', 80),
   highlights: [
-    sanitizePdfText(branding.highlights?.[0], defaultProposalPdfBranding.highlights[0], 140),
-    sanitizePdfText(branding.highlights?.[1], defaultProposalPdfBranding.highlights[1], 140),
-    sanitizePdfText(branding.highlights?.[2], defaultProposalPdfBranding.highlights[2], 140),
+    sanitizePdfText(
+      branding.highlights?.[0],
+      defaultProposalPdfBranding.highlights[0],
+      140,
+    ),
+    sanitizePdfText(
+      branding.highlights?.[1],
+      defaultProposalPdfBranding.highlights[1],
+      140,
+    ),
+    sanitizePdfText(
+      branding.highlights?.[2],
+      defaultProposalPdfBranding.highlights[2],
+      140,
+    ),
   ],
-  paymentTerms: sanitizePdfText(branding.paymentTerms, defaultProposalPdfBranding.paymentTerms, 140),
-  deliveryEstimate: sanitizePdfText(branding.deliveryEstimate, defaultProposalPdfBranding.deliveryEstimate, 120),
+  paymentTerms: sanitizePdfText(
+    branding.paymentTerms,
+    defaultProposalPdfBranding.paymentTerms,
+    140,
+  ),
+  deliveryEstimate: sanitizePdfText(
+    branding.deliveryEstimate,
+    defaultProposalPdfBranding.deliveryEstimate,
+    120,
+  ),
   confidentialityNote: sanitizePdfText(
     branding.confidentialityNote,
     defaultProposalPdfBranding.confidentialityNote,
     180,
   ),
-  guaranteeNote: sanitizePdfText(branding.guaranteeNote, defaultProposalPdfBranding.guaranteeNote, 180),
-  signatureName: sanitizePdfText(branding.signatureName, defaultProposalPdfBranding.signatureName, 80),
-  signatureRole: sanitizePdfText(branding.signatureRole, defaultProposalPdfBranding.signatureRole, 80),
+  guaranteeNote: sanitizePdfText(
+    branding.guaranteeNote,
+    defaultProposalPdfBranding.guaranteeNote,
+    180,
+  ),
+  signatureName: sanitizePdfText(
+    branding.signatureName,
+    defaultProposalPdfBranding.signatureName,
+    80,
+  ),
+  signatureRole: sanitizePdfText(
+    branding.signatureRole,
+    defaultProposalPdfBranding.signatureRole,
+    80,
+  ),
 })
 
-export const normalizeProposalPdfDocumentData = (data: ProposalPdfDocumentData): ProposalPdfDocumentData => ({
+export const normalizeProposalPdfDocumentData = (
+  data: ProposalPdfDocumentData,
+): ProposalPdfDocumentData => ({
   generatedAt: sanitizePdfText(data.generatedAt, new Date().toISOString(), 40),
   proposal: {
     ...data.proposal,
@@ -103,7 +160,9 @@ export const normalizeProposalPdfDocumentData = (data: ProposalPdfDocumentData):
       ...item,
       description: sanitizePdfText(item.description, 'Item', 120),
     })),
-    ...(data.proposal.notes ? { notes: sanitizePdfText(data.proposal.notes, '', 1200) } : {}),
+    ...(data.proposal.notes
+      ? { notes: sanitizePdfText(data.proposal.notes, '', 1200) }
+      : {}),
   },
   ...(data.client
     ? {

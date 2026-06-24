@@ -1,4 +1,4 @@
-import type { User } from '@/@types'
+import type { AuthResponse, User } from '@/@types'
 import { authService } from '@/api/services/auth.service'
 import type { LoginInput, RegisterInput } from '@/validators/auth.schema'
 import { create } from 'zustand'
@@ -6,19 +6,25 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 
 interface AuthState {
   token: string | null
+  role: string | null
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
-  login: (payload: LoginInput) => Promise<void>
+  login: (payload: LoginInput) => Promise<AuthResponse>
   register: (payload: RegisterInput) => Promise<void>
   hydrateUser: () => Promise<void>
   logout: () => void
+  isSuperAdmin: () => boolean
 }
+
+const isSuperAdminRole = (role?: string | null) =>
+  role?.toUpperCase() === 'SUPERADMIN'
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       token: null,
+      role: null,
       user: null,
       isLoading: false,
       isAuthenticated: false,
@@ -28,26 +34,23 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authService.login({ email, password })
           localStorage.setItem('pe.auth-token', response.token)
+          localStorage.setItem('pe.auth-role', response.user.role)
           set({
             token: response.token,
+            role: response.user.role,
             user: response.user,
             isAuthenticated: true,
           })
+          return response
         } finally {
           set({ isLoading: false })
         }
       },
 
-      register: async ({ name, email, password }) => {
+      register: async (payload) => {
         set({ isLoading: true })
         try {
-          const response = await authService.register({ name, email, password })
-          localStorage.setItem('pe.auth-token', response.token)
-          set({
-            token: response.token,
-            user: response.user,
-            isAuthenticated: true,
-          })
+          await authService.register(payload)
         } finally {
           set({ isLoading: false })
         }
@@ -55,33 +58,31 @@ export const useAuthStore = create<AuthState>()(
 
       hydrateUser: async () => {
         const token = get().token ?? localStorage.getItem('pe.auth-token')
-        if (!token) {
-          set({ isAuthenticated: false, user: null, token: null })
+        const role = get().role ?? localStorage.getItem('pe.auth-role')
+        const user = get().user
+
+        if (!token || !user) {
+          set({ isAuthenticated: false, user: null, token: null, role: null })
           return
         }
 
-        set({ isLoading: true })
-        try {
-          const user = await authService.me(token)
-          set({ user, token, isAuthenticated: true })
-        } catch {
-          set({ isAuthenticated: false, user: null, token: null })
-          localStorage.removeItem('pe.auth-token')
-        } finally {
-          set({ isLoading: false })
-        }
+        set({ user, token, role, isAuthenticated: true })
       },
 
       logout: () => {
         localStorage.removeItem('pe.auth-token')
-        set({ token: null, user: null, isAuthenticated: false })
+        localStorage.removeItem('pe.auth-role')
+        set({ token: null, role: null, user: null, isAuthenticated: false })
       },
+
+      isSuperAdmin: () => isSuperAdminRole(get().role ?? get().user?.role),
     }),
     {
       name: 'pe.auth-storage',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         token: state.token,
+        role: state.role,
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),

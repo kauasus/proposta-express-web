@@ -14,10 +14,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-95',
-        outline: 'border border-input bg-background hover:bg-muted hover:text-foreground active:scale-95',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95',
+        default:
+          'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95',
+        destructive:
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-95',
+        outline:
+          'border border-input bg-background hover:bg-muted hover:text-foreground active:scale-95',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95',
         ghost: 'hover:bg-muted hover:text-foreground active:scale-95',
         link: 'text-primary underline-offset-4 hover:underline',
       },
@@ -35,18 +39,28 @@ const buttonVariants = cva(
   },
 )
 
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
+export interface ButtonProps
+  extends
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const MotionButton = motion.button as unknown as React.ForwardRefExoticComponent<
-      MotionButtonProps & React.RefAttributes<HTMLButtonElement>
-    >
+    const MotionButton =
+      motion.button as unknown as React.ForwardRefExoticComponent<
+        MotionButtonProps & React.RefAttributes<HTMLButtonElement>
+      >
 
     if (asChild) {
-      return <Slot ref={ref} className={buttonVariants({ variant, size, className })} {...props} />
+      return (
+        <Slot
+          ref={ref}
+          className={buttonVariants({ variant, size, className })}
+          {...props}
+        />
+      )
     }
 
     return (

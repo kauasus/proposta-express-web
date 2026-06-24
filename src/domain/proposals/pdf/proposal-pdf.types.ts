@@ -23,11 +23,27 @@ export interface ProposalPdfBranding {
 export interface ProposalPdfDocumentData {
   proposal: Pick<
     Proposal,
-    'title' | 'items' | 'subtotal' | 'discount' | 'total' | 'notes' | 'validUntil' | 'status' | 'createdAt' | 'updatedAt'
+    | 'title'
+    | 'items'
+    | 'subtotal'
+    | 'discount'
+    | 'total'
+    | 'notes'
+    | 'validUntil'
+    | 'status'
+    | 'createdAt'
+    | 'updatedAt'
   >
   client?: Pick<
     Client,
-    'name' | 'email' | 'phone' | 'secondaryPhone' | 'document' | 'zipCode' | 'address' | 'addressNumber'
+    | 'name'
+    | 'email'
+    | 'phone'
+    | 'secondaryPhone'
+    | 'document'
+    | 'zipCode'
+    | 'address'
+    | 'addressNumber'
   >
   branding: ProposalPdfBranding
   generatedAt: string
