@@ -24,6 +24,7 @@ export interface ProposalPdfDocumentData {
   proposal: Pick<
     Proposal,
     | 'title'
+    | 'subtitle'
     | 'items'
     | 'subtotal'
     | 'discount'

@@ -1,8 +1,18 @@
 import type { ProposalPdfDocumentData } from '@/domain/proposals/pdf/proposal-pdf.types'
-import { normalizeProposalPdfDocumentData, sanitizePdfText } from '@/domain/proposals/pdf/proposal-pdf.mapper'
+import {
+  normalizeProposalPdfDocumentData,
+  sanitizePdfText,
+} from '@/domain/proposals/pdf/proposal-pdf.mapper'
 import { formatCurrencyBRL } from '@/utils/currency'
 import { formatDate } from '@/utils/date'
-import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer'
+import {
+  Document,
+  Image,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+} from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
   page: {
@@ -49,13 +59,7 @@ const styles = StyleSheet.create({
   brandText: {
     flex: 1,
   },
-  eyebrow: {
-    fontSize: 8,
-    letterSpacing: 1.8,
-    textTransform: 'uppercase',
-    color: '#cbd5e1',
-    marginBottom: 4,
-  },
+
   title: {
     fontSize: 24,
     fontWeight: 700,
@@ -250,14 +254,18 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
   const hasLogo = Boolean(branding.logoUrl)
 
   const intro = sanitizePdfText(
-    `Apresentamos a proposta ${proposal.title} para ${client?.name ?? 'o cliente informado'}. O objetivo e entregar uma solucao clara, com escopo definido, previsibilidade comercial e comunicacao profissional do inicio ao fim.`,
+    ` ${proposal.title}`,
     '',
     520,
   )
-
+  const subtitle = sanitizePdfText(
+    ` ${proposal.subtitle}`,
+    '',
+    520,
+  )
   return (
     <Document>
-      <Page size='A4' style={styles.page} wrap>
+      <Page size="A4" style={styles.page} wrap>
         <View style={styles.topBand}>
           <View style={styles.topBandRow}>
             <View style={styles.brandBlock}>
@@ -265,34 +273,51 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
                 <Image src={branding.logoUrl} style={styles.logo} />
               ) : (
                 <View style={styles.logoBox}>
-                  <Text style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}>
+                  <Text
+                    style={{ color: '#fff', fontSize: 18, fontWeight: 700 }}
+                  >
                     {branding.brandName.slice(0, 1).toUpperCase()}
                   </Text>
                 </View>
               )}
 
               <View style={styles.brandText}>
-                <Text style={styles.eyebrow}>Proposta comercial premium</Text>
                 <Text style={styles.title}>{branding.brandName}</Text>
                 <Text style={styles.subtitle}>{branding.slogan}</Text>
               </View>
             </View>
 
             <View style={{ alignItems: 'flex-end' }}>
-              <Text style={{ fontSize: 8, color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: 1 }}>
+              <Text
+                style={{
+                  fontSize: 8,
+                  color: '#cbd5e1',
+                  textTransform: 'uppercase',
+                  letterSpacing: 1,
+                }}
+              >
                 Documento confidencial
               </Text>
-              <Text style={{ fontSize: 11, fontWeight: 700, color: '#fff', marginTop: 4 }}>
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: '#fff',
+                  marginTop: 4,
+                }}
+              >
                 {formatDate(proposal.createdAt)}
               </Text>
-              <Text style={{ fontSize: 8, color: '#cbd5e1', marginTop: 2 }}>Gerado em {formatDate(generatedAt)}</Text>
+              <Text style={{ fontSize: 8, color: '#cbd5e1', marginTop: 2 }}>
+                Gerado em {formatDate(generatedAt)}
+              </Text>
             </View>
           </View>
         </View>
 
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>Resumo executivo</Text>
-          <Text style={styles.value}>{intro}</Text>
+          <Text style={styles.sectionTitle}>{intro}</Text>
+          <Text style={styles.value}>{subtitle}</Text>
         </View>
 
         <View style={styles.grid2}>
@@ -326,7 +351,9 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
             <Text style={styles.value}>{branding.phone || '-'}</Text>
             <Text style={[styles.label, { marginTop: 8 }]}>Endereco</Text>
             <Text style={styles.value}>
-              {branding.address ? `${branding.address}${branding.cityState ? ` - ${branding.cityState}` : ''}` : '-'}
+              {branding.address
+                ? `${branding.address}${branding.cityState ? ` - ${branding.cityState}` : ''}`
+                : '-'}
             </Text>
           </View>
         </View>
@@ -334,17 +361,25 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
         <View style={styles.metricsRow}>
           <View style={styles.metric}>
             <Text style={styles.metricLabel}>Subtotal</Text>
-            <Text style={styles.metricValue}>{formatCurrencyBRL(proposal.subtotal)}</Text>
-            <Text style={styles.metricHint}>Somatorio dos itens da proposta.</Text>
+            <Text style={styles.metricValue}>
+              {formatCurrencyBRL(proposal.subtotal)}
+            </Text>
+            <Text style={styles.metricHint}>
+              Somatorio dos itens da proposta.
+            </Text>
           </View>
           <View style={styles.metric}>
             <Text style={styles.metricLabel}>Desconto</Text>
-            <Text style={styles.metricValue}>{formatCurrencyBRL(proposal.discount)}</Text>
+            <Text style={styles.metricValue}>
+              {formatCurrencyBRL(proposal.discount)}
+            </Text>
             <Text style={styles.metricHint}>Desconto comercial aplicado.</Text>
           </View>
           <View style={styles.metric}>
             <Text style={styles.metricLabel}>Total</Text>
-            <Text style={styles.metricValue}>{formatCurrencyBRL(proposal.total)}</Text>
+            <Text style={styles.metricValue}>
+              {formatCurrencyBRL(proposal.total)}
+            </Text>
             <Text style={styles.metricHint}>Valor final para aprovacao.</Text>
           </View>
         </View>
@@ -361,11 +396,19 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
           {proposal.items.map((item) => (
             <View key={item.id} style={styles.tableRow} wrap={false}>
               <View style={styles.itemDescription}>
-                <Text style={{ fontSize: 10, fontWeight: 700, color: '#0f172a' }}>{item.description}</Text>
+                <Text
+                  style={{ fontSize: 10, fontWeight: 700, color: '#0f172a' }}
+                >
+                  {item.description}
+                </Text>
               </View>
               <Text style={styles.itemCell}>{item.quantity}</Text>
-              <Text style={styles.itemCell}>{formatCurrencyBRL(item.unitPrice)}</Text>
-              <Text style={styles.itemCell}>{formatCurrencyBRL(item.quantity * item.unitPrice)}</Text>
+              <Text style={styles.itemCell}>
+                {formatCurrencyBRL(item.unitPrice)}
+              </Text>
+              <Text style={styles.itemCell}>
+                {formatCurrencyBRL(item.quantity * item.unitPrice)}
+              </Text>
             </View>
           ))}
         </View>
@@ -389,7 +432,9 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
             <Text style={styles.value}>{branding.deliveryEstimate}</Text>
             <Text style={[styles.label, { marginTop: 8 }]}>Pagamento</Text>
             <Text style={styles.value}>{branding.paymentTerms}</Text>
-            <Text style={[styles.label, { marginTop: 8 }]}>Confidencialidade</Text>
+            <Text style={[styles.label, { marginTop: 8 }]}>
+              Confidencialidade
+            </Text>
             <Text style={styles.value}>{branding.confidentialityNote}</Text>
             <Text style={[styles.label, { marginTop: 8 }]}>Garantia</Text>
             <Text style={styles.value}>{branding.guaranteeNote}</Text>
@@ -407,7 +452,8 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
           <Text style={styles.summaryLabel}>Proxima etapa</Text>
           <Text style={styles.summaryValue}>Aguardando aprovacao</Text>
           <Text style={styles.summaryHint}>
-            Após a aprovacao, seguimos com o onboarding e o alinhamento final de escopo.
+            Após a aprovacao, seguimos com o onboarding e o alinhamento final de
+            escopo.
           </Text>
         </View>
 
@@ -420,7 +466,9 @@ export const ProposalPdfDocument = ({ data }: ProposalPdfDocumentProps) => {
           <Text>{branding.brandName}</Text>
           <Text>Proposta {proposal.title}</Text>
           <Text
-            render={({ pageNumber, totalPages }) => `Pagina ${pageNumber} de ${totalPages}`}
+            render={({ pageNumber, totalPages }) =>
+              `Pagina ${pageNumber} de ${totalPages}`
+            }
           />
         </View>
       </Page>

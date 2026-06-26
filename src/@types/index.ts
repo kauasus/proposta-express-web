@@ -50,14 +50,15 @@ export interface Proposal {
   id: string
   clientId: string
   title: string
+  subtitle?: string
   status: ProposalStatus
-  validUntil: string
+  validUntil: Date
   notes?: string
   publicToken: string
   items: ProposalItem[]
   subtotal: number
   discount: number
   total: number
-  createdAt: string
-  updatedAt: string
+  createdAt: Date
+  updatedAt: Date
 }

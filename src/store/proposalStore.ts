@@ -10,7 +10,7 @@ interface ProposalState {
   proposals: Proposal[]
   isLoadingClients: boolean
   isLoadingProposals: boolean
-  fetchClients: () => Promise<void>
+  fetchClients: (companyId?: string) => Promise<void>
   createClient: (payload: ClientInput) => Promise<void>
   updateClient: (id: string, payload: ClientInput) => Promise<void>
   removeClient: (id: string) => Promise<void>
@@ -27,10 +27,10 @@ export const useProposalStore = create<ProposalState>((set) => ({
   isLoadingClients: false,
   isLoadingProposals: false,
 
-  fetchClients: async () => {
+  fetchClients: async (companyId?: string) => {
     set({ isLoadingClients: true })
     try {
-      const clients = await clientService.list()
+      const clients = companyId ? await clientService.listByCompanyId(companyId) : await clientService.list()
       set({ clients })
     } finally {
       set({ isLoadingClients: false })

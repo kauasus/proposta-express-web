@@ -58,6 +58,15 @@ export const clientService = {
     return mockDb.getClients()
   },
 
+  async listByCompanyId(companyId: string): Promise<Client[]> {
+    try {
+      const response = await apiClient.get<Client[]>(`/customers/${companyId}`)
+      return response.data
+    } catch (error) {
+      return throwApiError(error, 'Não conseguimos listar os clientes.')
+    }
+  },
+
   async create(payload: ClientInput): Promise<Client> {
     try {
       await apiClient.post('/customer/create', toCustomerPayload(payload))
@@ -84,7 +93,12 @@ export const clientService = {
       throw new Error('Cliente não encontrado')
     }
 
-    const updated: Client = { ...current, ...toLocalClient(payload), id, createdAt: current.createdAt }
+    const updated: Client = {
+      ...current,
+      ...toLocalClient(payload),
+      id,
+      createdAt: current.createdAt,
+    }
     clients[index] = updated
     mockDb.saveClients(clients)
     return updated

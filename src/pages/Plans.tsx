@@ -6,7 +6,6 @@ import { PageHeader } from '@/components/shared/PageHeader'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -61,7 +60,7 @@ export const PlansPage = () => {
                   <Layers3 className="h-5 w-5 text-primary" />
                   {plan.name}
                 </CardTitle>
-                <CardDescription>ID: {plan.planId}</CardDescription>
+                
               </CardHeader>
               <CardContent />
             </Card>

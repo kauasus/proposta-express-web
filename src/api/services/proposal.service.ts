@@ -1,6 +1,5 @@
 import type { Proposal } from '@/@types'
 import { mockDb } from '@/api/mock-db'
-import { nowIso } from '@/utils/date'
 import type { ProposalInput } from '@/validators/proposal.schema'
 
 const delay = async (): Promise<void> =>
@@ -44,6 +43,7 @@ export const proposalService = {
     const base: Proposal = {
       id: crypto.randomUUID(),
       title: payload.title,
+      subtitle : payload.subtitle,
       clientId: payload.clientId,
       status: 'draft',
       validUntil: payload.validUntil,
@@ -52,8 +52,8 @@ export const proposalService = {
       subtotal,
       discount: payload.discount,
       total,
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
+      createdAt:  new Date(),
+      updatedAt: new Date(),
     }
 
     const proposal: Proposal = payload.notes
@@ -83,7 +83,7 @@ export const proposalService = {
       subtotal,
       total,
       items: payload.items.map(mapItem),
-      updatedAt: nowIso(),
+      updatedAt: new Date(),
     }
 
     let updated: Proposal = { ...base }
@@ -117,7 +117,7 @@ export const proposalService = {
     const updated: Proposal = {
       ...current,
       status: 'sent',
-      updatedAt: nowIso(),
+      updatedAt: new Date(),
     }
     proposals[index] = updated
     mockDb.saveProposals(proposals)
@@ -144,7 +144,7 @@ export const proposalService = {
     const current = proposals[index]
     if (!current || current.status !== 'sent') return
 
-    proposals[index] = { ...current, status: 'viewed', updatedAt: nowIso() }
+    proposals[index] = { ...current, status: 'viewed', updatedAt: new Date() }
     mockDb.saveProposals(proposals)
   },
 
@@ -162,7 +162,7 @@ export const proposalService = {
     const updated: Proposal = {
       ...current,
       status: 'accepted',
-      updatedAt: nowIso(),
+      updatedAt: new Date(),
     }
     proposals[index] = updated
     mockDb.saveProposals(proposals)
