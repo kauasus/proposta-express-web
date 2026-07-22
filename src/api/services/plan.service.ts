@@ -8,7 +8,7 @@ export const planService = {
       const response = await apiClient.get<PlanDto[]>('/plans')
       return response.data
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos carregar os planos.')
+      return throwApiError(error, 'Não foi possível carregar os planos.')
     }
   },
 }

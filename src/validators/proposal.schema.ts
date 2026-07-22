@@ -10,7 +10,7 @@ export const proposalItemSchema = z.object({
 export const proposalSchema = z.object({
   title: z.string().min(3, 'Título obrigatório'),
   clientId: z.string().min(1, 'Selecione um cliente'),
-  validUntil: z.date(),
+  validUntil: z.string().min(1, 'Informe a validade'),
   subtitle: z.string(),
   notes: z.string().optional(),
   discount: z.number().min(0),

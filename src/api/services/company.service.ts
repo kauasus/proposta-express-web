@@ -7,7 +7,7 @@ export const companyService = {
     try {
       await apiClient.post('/company/create', payload)
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos criar a empresa.')
+      return throwApiError(error, 'Não foi possível criar a empresa.')
     }
   },
 }

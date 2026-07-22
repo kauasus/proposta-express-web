@@ -4,10 +4,22 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
 import { PageHeader } from '@/components/shared/PageHeader'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { useAuth } from '@/hooks/useAuth'
 import { useClients } from '@/hooks/useClients'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -85,7 +97,14 @@ const toClientFormValues = (client?: Partial<Client>): ClientInput => ({
 })
 
 export const ClientsPage = () => {
-  const { clients, isLoading, fetchClients, createClient, updateClient, removeClient } = useClients()
+  const {
+    clients,
+    isLoading,
+    fetchClients,
+    createClient,
+    updateClient,
+    removeClient,
+  } = useClients()
   const { user } = useAuth()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
@@ -119,27 +138,36 @@ export const ClientsPage = () => {
     try {
       const response = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
       if (!response.ok) {
-        throw new Error('Não conseguimos encontrar esse CEP')
+        throw new Error('Não foi possível encontrar esse CEP')
       }
 
-      const data = (await response.json()) as { erro?: boolean; logradouro?: string }
+      const data = (await response.json()) as {
+        erro?: boolean
+        logradouro?: string
+      }
 
       if (data.erro) {
-        form.setError('zipCode', { type: 'validate', message: 'CEP não encontrado' })
+        form.setError('zipCode', {
+          type: 'validate',
+          message: 'CEP não encontrado',
+        })
         return
       }
 
       form.clearErrors('zipCode')
-      form.setValue('address', data.logradouro ?? '', { shouldDirty: true, shouldValidate: true })
+      form.setValue('address', data.logradouro ?? '', {
+        shouldDirty: true,
+        shouldValidate: true,
+      })
     } catch {
-      toast.error('Não conseguimos preencher o endereço com esse CEP')
+      toast.error('Não foi possível preencher o endereço com esse CEP')
     }
   }
 
   const onSubmit = async (data: ClientInput) => {
     try {
       if (editingClient) {
-        await updateClient(editingClient.id, data)
+        await updateClient(editingClient.customerId ?? editingClient.id, data)
         toast.success('Cliente atualizado com sucesso')
       } else {
         await createClient(data)
@@ -147,7 +175,11 @@ export const ClientsPage = () => {
       }
       setIsModalOpen(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Não conseguimos salvar o cliente. Tente novamente.')
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível salvar o cliente. Tente novamente.',
+      )
     }
   }
 
@@ -158,16 +190,16 @@ export const ClientsPage = () => {
       toast.success('Cliente removido com sucesso')
       setClientToDelete(null)
     } catch {
-      toast.error('Não conseguimos remover o cliente. Tente novamente.')
+      toast.error('Não foi possível remover o cliente. Tente novamente.')
     }
   }
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       <PageHeader
-        title='Clientes'
-        description='Mantenha seus contatos organizados e pronto para criar propostas.'
-        actionLabel='Novo cliente'
+        title="Clientes"
+        description="Mantenha seus contatos organizados e pronto para criar propostas."
+        actionLabel="Novo cliente"
         actionIcon={Plus}
         onAction={openCreateModal}
       />
@@ -177,43 +209,57 @@ export const ClientsPage = () => {
       ) : clients.length === 0 ? (
         <EmptyState
           icon={Inbox}
-          title='Nenhum cliente cadastrado'
-          description='Crie seu primeiro cliente para começar a fazer propostas.'
-          ctaLabel='Cadastrar cliente'
+          title="Nenhum cliente cadastrado"
+          description="Crie seu primeiro cliente para começar a fazer propostas."
+          ctaLabel="Cadastrar cliente"
           onCtaClick={openCreateModal}
         />
       ) : (
-        <Table className='min-w-[780px]'>
+        <Table className="min-w-[780px]">
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
               <TableHead>Telefone</TableHead>
               <TableHead>Documento</TableHead>
-              <TableHead className='text-right'>Ações</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {clients.map((client) => (
-              <TableRow key={client.id}>
-                <TableCell className='font-medium text-foreground'>{client.name}</TableCell>
+              <TableRow key={client.customerId ?? client.id}>
+                <TableCell className="font-medium text-foreground">
+                  {client.name}
+                </TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell>
-                  <div className='flex flex-col'>
+                  <div className="flex flex-col">
                     <span>{client.phone}</span>
                     {client.otherPhone || client.secondaryPhone ? (
-                      <span className='text-xs text-muted-foreground'>{client.otherPhone ?? client.secondaryPhone}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {client.otherPhone ?? client.secondaryPhone}
+                      </span>
                     ) : null}
                   </div>
                 </TableCell>
-                <TableCell>{client.identification ?? client.document}</TableCell>
-                <TableCell className='text-right'>
-                  <div className='flex justify-end gap-2'>
-                    <Button variant='outline' size='sm' onClick={() => openEditModal(client)}>
-                      <Pencil className='h-4 w-4' />
+                <TableCell>
+                  {client.identification ?? client.document}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditModal(client)}
+                    >
+                      <Pencil className="h-4 w-4" />
                     </Button>
-                    <Button variant='destructive' size='sm' onClick={() => setClientToDelete(client)}>
-                      <Trash2 className='h-4 w-4' />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => setClientToDelete(client)}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>
@@ -224,105 +270,133 @@ export const ClientsPage = () => {
       )}
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className='sm:max-w-2xl border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-sky-50/60 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.35)]'>
+        <DialogContent className="sm:max-w-2xl border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-sky-50/60 shadow-[0_30px_80px_-28px_rgba(15,23,42,0.35)]">
           <DialogHeader>
-            <DialogTitle className='font-display text-2xl text-slate-900'>
+            <DialogTitle className="font-display text-2xl text-slate-900">
               {editingClient ? 'Editar cliente' : 'Novo cliente'}
             </DialogTitle>
           </DialogHeader>
 
-          <form className='grid gap-4 rounded-[1.5rem] border border-slate-200/70 bg-white/80 p-5 shadow-sm' onSubmit={form.handleSubmit(onSubmit)}>
-            <div className='grid gap-4 md:grid-cols-2'>
-              <div className='space-y-2'>
+          <form
+            className="grid gap-4 rounded-[1.5rem] border border-slate-200/70 bg-white/80 p-5 shadow-sm"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <Label>Nome</Label>
-                <Input placeholder='Nome do cliente' {...form.register('name')} />
-                <p className='text-xs text-destructive'>{form.formState.errors.name?.message}</p>
+                <Input
+                  placeholder="Nome do cliente"
+                  {...form.register('name')}
+                />
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.name?.message}
+                </p>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 <Label>E-mail</Label>
-                <Input type='email' placeholder='cliente@empresa.com' {...form.register('email')} />
-                <p className='text-xs text-destructive'>{form.formState.errors.email?.message}</p>
+                <Input
+                  type="email"
+                  placeholder="cliente@empresa.com"
+                  {...form.register('email')}
+                />
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.email?.message}
+                </p>
               </div>
             </div>
 
-            <div className='grid gap-4 md:grid-cols-2'>
-              <div className='space-y-2'>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <Label>ID da empresa</Label>
                 <Input
-                  className='font-mono text-xs'
-                  placeholder='00000000-0000-0000-0000-000000000000'
+                  className="font-mono text-xs"
+                  placeholder="00000000-0000-0000-0000-000000000000"
                   readOnly
                   {...form.register('companyId')}
                 />
-                <p className='text-xs text-muted-foreground'>Preenchido automaticamente com sua empresa</p>
+                <p className="text-xs text-muted-foreground">
+                  Preenchido automaticamente com sua empresa
+                </p>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 <Label>Telefone principal</Label>
                 <Controller
                   control={form.control}
-                  name='phone'
+                  name="phone"
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
-                      inputMode='numeric'
-                      placeholder='(00) 00000-0000'
+                      inputMode="numeric"
+                      placeholder="(00) 00000-0000"
                       value={field.value}
                       onBlur={field.onBlur}
-                      onChange={(event) => field.onChange(formatPhone(event.target.value))}
+                      onChange={(event) =>
+                        field.onChange(formatPhone(event.target.value))
+                      }
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.phone?.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.phone?.message}
+                </p>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 <Label>Telefone secundário</Label>
                 <Controller
                   control={form.control}
-                  name='otherPhone'
+                  name="otherPhone"
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
-                      inputMode='numeric'
-                      placeholder='(00) 00000-0000'
+                      inputMode="numeric"
+                      placeholder="(00) 00000-0000"
                       value={field.value}
                       onBlur={field.onBlur}
-                      onChange={(event) => field.onChange(formatPhone(event.target.value))}
+                      onChange={(event) =>
+                        field.onChange(formatPhone(event.target.value))
+                      }
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.otherPhone?.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.otherPhone?.message}
+                </p>
               </div>
             </div>
 
-            <div className='grid gap-4 md:grid-cols-2'>
-              <div className='space-y-2'>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
                 <Label>CPF/CNPJ</Label>
                 <Controller
                   control={form.control}
-                  name='identification'
+                  name="identification"
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
-                      inputMode='numeric'
-                      placeholder='00.000.000/0000-00'
+                      inputMode="numeric"
+                      placeholder="00.000.000/0000-00"
                       value={field.value}
                       onBlur={field.onBlur}
-                      onChange={(event) => field.onChange(formatDocument(event.target.value))}
+                      onChange={(event) =>
+                        field.onChange(formatDocument(event.target.value))
+                      }
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.identification?.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.identification?.message}
+                </p>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 <Label>CEP</Label>
                 <Controller
                   control={form.control}
-                  name='zipCode'
+                  name="zipCode"
                   render={({ field }) => (
                     <Input
                       ref={field.ref}
-                      inputMode='numeric'
-                      placeholder='00000-000'
+                      inputMode="numeric"
+                      placeholder="00000-000"
                       value={field.value}
                       onBlur={async () => {
                         field.onBlur()
@@ -338,28 +412,39 @@ export const ClientsPage = () => {
                     />
                   )}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.zipCode?.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.zipCode?.message}
+                </p>
               </div>
             </div>
 
-            <div className='grid gap-4 md:grid-cols-[1fr,180px]'>
-              <div className='space-y-2'>
+            <div className="grid gap-4 md:grid-cols-[1fr,180px]">
+              <div className="space-y-2">
                 <Label>Endereço</Label>
-                <Input placeholder='Rua, avenida, bairro' {...form.register('address')} />
-                <p className='text-xs text-destructive'>{form.formState.errors.address?.message}</p>
+                <Input
+                  placeholder="Rua, avenida, bairro"
+                  {...form.register('address')}
+                />
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.address?.message}
+                </p>
               </div>
-              <div className='space-y-2'>
+              <div className="space-y-2">
                 <Label>Número</Label>
                 <Input
-                  inputMode='numeric'
-                  placeholder='123'
-                  {...form.register('streetNumber', { setValueAs: (value) => onlyDigits(String(value)) })}
+                  inputMode="numeric"
+                  placeholder="123"
+                  {...form.register('streetNumber', {
+                    setValueAs: (value) => onlyDigits(String(value)),
+                  })}
                 />
-                <p className='text-xs text-destructive'>{form.formState.errors.streetNumber?.message}</p>
+                <p className="text-xs text-destructive">
+                  {form.formState.errors.streetNumber?.message}
+                </p>
               </div>
             </div>
 
-            <Button type='submit' className='w-full sm:w-auto sm:self-end'>
+            <Button type="submit" className="w-full sm:w-auto sm:self-end">
               {editingClient ? 'Salvar alterações' : 'Cadastrar cliente'}
             </Button>
           </form>
@@ -368,9 +453,9 @@ export const ClientsPage = () => {
 
       <ConfirmDialog
         open={Boolean(clientToDelete)}
-        title='Remover cliente?'
-        description='Essa ação não poderá ser desfeita.'
-        confirmLabel='Remover'
+        title="Remover cliente?"
+        description="Essa ação não poderá ser desfeita."
+        confirmLabel="Remover"
         onCancel={() => setClientToDelete(null)}
         onConfirm={handleDelete}
       />

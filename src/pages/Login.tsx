@@ -27,7 +27,7 @@ export const LoginPage = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Não conseguimos fazer seu login. Tente novamente.',
+          : 'Não foi possível fazer seu login. Tente novamente.',
       )
     }
   }

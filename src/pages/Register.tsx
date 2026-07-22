@@ -33,7 +33,7 @@ export const RegisterPage = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Não conseguimos criar sua conta. Tente novamente.',
+          : 'Não foi possível criar sua conta. Tente novamente.',
       )
     }
   }

@@ -12,7 +12,7 @@ interface ProposalState {
   isLoadingProposals: boolean
   fetchClients: (companyId?: string) => Promise<void>
   createClient: (payload: ClientInput) => Promise<void>
-  updateClient: (id: string, payload: ClientInput) => Promise<void>
+  updateClient: (id: string, payload: ClientInput) => Promise<Client>
   removeClient: (id: string) => Promise<void>
   fetchProposals: () => Promise<void>
   createProposal: (payload: ProposalInput) => Promise<Proposal>
@@ -44,9 +44,11 @@ export const useProposalStore = create<ProposalState>((set) => ({
   },
 
   updateClient: async (id, payload) => {
-    await clientService.update(id, payload)
-    const clients = await clientService.list()
-    set({ clients })
+    const updatedClient = await clientService.update(id, payload)
+    set((state) => ({
+      clients: state.clients.map((client) => ((client.customerId ?? client.id) === id ? updatedClient : client)),
+    }))
+    return updatedClient
   },
 
   removeClient: async (id) => {

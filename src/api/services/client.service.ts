@@ -6,6 +6,12 @@ import { mockDb } from '@/api/mock-db'
 import { nowIso } from '@/utils/date'
 import type { ClientInput } from '@/validators/client.schema'
 
+type ApiClient = Partial<Client> & {
+  customerId?: string
+}
+
+type UpdateCustomerRequestDto = Omit<CreateCustomerRequestDto, 'companyId'>
+
 const toCustomerPayload = (payload: ClientInput): CreateCustomerRequestDto => {
   const customer: CreateCustomerRequestDto = {
     name: payload.name,
@@ -25,6 +31,52 @@ const toCustomerPayload = (payload: ClientInput): CreateCustomerRequestDto => {
   if (payload.country) customer.country = payload.country
 
   return customer
+}
+
+const toCustomerUpdatePayload = (payload: ClientInput): UpdateCustomerRequestDto => {
+  const customer: UpdateCustomerRequestDto = {
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone,
+  }
+
+  if (payload.otherPhone) customer.otherPhone = payload.otherPhone
+  if (payload.identification) customer.identification = payload.identification
+  if (payload.zipCode) customer.zipCode = payload.zipCode
+  if (payload.address) customer.address = payload.address
+  if (payload.streetNumber) customer.streetNumber = payload.streetNumber
+  if (payload.sublocality) customer.sublocality = payload.sublocality
+  if (payload.city) customer.city = payload.city
+  if (payload.state) customer.state = payload.state
+  if (payload.country) customer.country = payload.country
+
+  return customer
+}
+
+const normalizeApiClient = (client: ApiClient): Client => {
+  const id = client.id ?? client.customerId ?? ''
+
+  return {
+    id,
+    customerId: client.customerId ?? id,
+    name: client.name ?? '',
+    email: client.email ?? '',
+    phone: client.phone ?? '',
+    companyId: client.companyId ?? '',
+    secondaryPhone: client.secondaryPhone ?? client.otherPhone ?? '',
+    document: client.document ?? client.identification ?? '',
+    zipCode: client.zipCode ?? '',
+    address: client.address ?? '',
+    addressNumber: client.addressNumber ?? client.streetNumber ?? '',
+    createdAt: client.createdAt ?? nowIso(),
+    ...(client.otherPhone ? { otherPhone: client.otherPhone } : {}),
+    ...(client.identification ? { identification: client.identification } : {}),
+    ...(client.streetNumber ? { streetNumber: client.streetNumber } : {}),
+    ...(client.sublocality ? { sublocality: client.sublocality } : {}),
+    ...(client.city ? { city: client.city } : {}),
+    ...(client.state ? { state: client.state } : {}),
+    ...(client.country ? { country: client.country } : {}),
+  }
 }
 
 const toLocalClient = (payload: ClientInput): Client => {
@@ -53,6 +105,8 @@ const toLocalClient = (payload: ClientInput): Client => {
   return client
 }
 
+const resolveClientId = (client: Client) => client.customerId ?? client.id
+
 export const clientService = {
   async list(): Promise<Client[]> {
     return mockDb.getClients()
@@ -60,10 +114,10 @@ export const clientService = {
 
   async listByCompanyId(companyId: string): Promise<Client[]> {
     try {
-      const response = await apiClient.get<Client[]>(`/customers/${companyId}`)
-      return response.data
+      const response = await apiClient.get<ApiClient[]>(`/customers/${companyId}`)
+      return response.data.map(normalizeApiClient)
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos listar os clientes.')
+      return throwApiError(error, 'Nao foi possivel listar os clientes.')
     }
   },
 
@@ -71,7 +125,7 @@ export const clientService = {
     try {
       await apiClient.post('/customer/create', toCustomerPayload(payload))
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos criar o cliente.')
+      return throwApiError(error, 'Nao foi possivel criar o cliente.')
     }
 
     const client = toLocalClient(payload)
@@ -81,30 +135,40 @@ export const clientService = {
   },
 
   async update(id: string, payload: ClientInput): Promise<Client> {
+    if (!id) {
+      throw new Error('ID do cliente nao encontrado para atualizar.')
+    }
+
+    try {
+      await apiClient.put(`/customer/${id}`, {
+        data: toCustomerUpdatePayload(payload),
+      })
+    } catch (error) {
+      return throwApiError(error, 'Nao foi possivel atualizar o cliente.')
+    }
+
     const clients = mockDb.getClients()
-    const index = clients.findIndex((item) => item.id === id)
-
-    if (index < 0) {
-      throw new Error('Cliente não encontrado')
-    }
-
+    const index = clients.findIndex((item) => resolveClientId(item) === id)
     const current = clients[index]
-    if (!current) {
-      throw new Error('Cliente não encontrado')
-    }
-
     const updated: Client = {
-      ...current,
+      ...(current ?? {}),
       ...toLocalClient(payload),
       id,
-      createdAt: current.createdAt,
+      customerId: current?.customerId ?? id,
+      createdAt: current?.createdAt ?? nowIso(),
     }
-    clients[index] = updated
+
+    if (index >= 0) {
+      clients[index] = updated
+    } else {
+      clients.unshift(updated)
+    }
+
     mockDb.saveClients(clients)
     return updated
   },
 
   async remove(id: string): Promise<void> {
-    mockDb.saveClients(mockDb.getClients().filter((item) => item.id !== id))
+    mockDb.saveClients(mockDb.getClients().filter((item) => resolveClientId(item) !== id))
   },
 }

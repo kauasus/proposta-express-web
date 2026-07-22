@@ -48,6 +48,7 @@ import {
 
 const defaultValues: ProposalInput = {
   title: '',
+  subtitle: '',
   clientId: '',
   validUntil: '',
   notes: '',
@@ -144,7 +145,7 @@ export const ProposalEditorPage = () => {
     [subtotal, watchedDiscount],
   )
   const selectedClient = useMemo(
-    () => clients.find((client) => client.id === watchedClientId),
+    () => clients.find((client) => (client.customerId ?? client.id) === watchedClientId),
     [clients, watchedClientId],
   )
 
@@ -288,7 +289,7 @@ export const ProposalEditorPage = () => {
                           </SelectTrigger>
                           <SelectContent>
                             {clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
+                              <SelectItem key={client.customerId ?? client.id} value={client.customerId ?? client.id}>
                                 {client.name}
                               </SelectItem>
                             ))}

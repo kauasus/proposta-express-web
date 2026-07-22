@@ -25,7 +25,7 @@ export const CompanyCreatePage = () => {
       toast.error(
         error instanceof Error
           ? error.message
-          : 'Não conseguimos criar a empresa. Tente novamente.',
+          : 'Não foi possível criar a empresa. Tente novamente.',
       )
     }
   }

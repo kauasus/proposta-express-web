@@ -3,12 +3,7 @@ import { planService } from '@/api/services/plan.service'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { LoadingSkeleton } from '@/components/shared/LoadingSkeleton'
 import { PageHeader } from '@/components/shared/PageHeader'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Inbox, Layers3 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -26,7 +21,7 @@ export const PlansPage = () => {
         toast.error(
           error instanceof Error
             ? error.message
-            : 'Não conseguimos carregar os planos. Tente novamente.',
+            : 'Não foi possível carregar os planos. Tente novamente.',
         )
       } finally {
         setIsLoading(false)
@@ -60,7 +55,6 @@ export const PlansPage = () => {
                   <Layers3 className="h-5 w-5 text-primary" />
                   {plan.name}
                 </CardTitle>
-                
               </CardHeader>
               <CardContent />
             </Card>

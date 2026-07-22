@@ -20,6 +20,7 @@ export interface AuthResponse {
 
 export interface Client {
   id: string
+  customerId?: string
   name: string
   email: string
   phone: string
@@ -52,13 +53,13 @@ export interface Proposal {
   title: string
   subtitle?: string
   status: ProposalStatus
-  validUntil: Date
+  validUntil: string
   notes?: string
   publicToken: string
   items: ProposalItem[]
   subtotal: number
   discount: number
   total: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }

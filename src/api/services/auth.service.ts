@@ -34,7 +34,7 @@ export const authService = {
       )
       return mapLoginResponseToAuth(response.data, payload.email)
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos fazer o login.')
+      return throwApiError(error, 'Não foi possível fazer o login.')
     }
   },
 
@@ -42,7 +42,7 @@ export const authService = {
     try {
       await apiClient.post('/account/signup', payload)
     } catch (error) {
-      return throwApiError(error, 'Não conseguimos criar a conta.')
+      return throwApiError(error, 'Não foi possível criar a conta.')
     }
   },
 }
