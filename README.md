@@ -72,11 +72,11 @@ src/
 - POST `/auth/login`
 - GET `/auth/me`
 
-### Clients
-- GET `/clients`
-- POST `/clients`
-- PUT `/clients/:id`
-- DELETE `/clients/:id`
+### Customer
+- GET `/customer`
+- POST `/customer`
+- PUT `/customer/:id`
+- DELETE `/customer/:id`
 
 ### Proposals
 - GET `/proposals`

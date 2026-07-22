@@ -186,7 +186,7 @@ export const ClientsPage = () => {
   const handleDelete = async () => {
     if (!clientToDelete) return
     try {
-      await removeClient(clientToDelete.id)
+      await removeClient(clientToDelete.customerId ?? clientToDelete.id)
       toast.success('Cliente removido com sucesso')
       setClientToDelete(null)
     } catch {

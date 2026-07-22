@@ -169,6 +169,16 @@ export const clientService = {
   },
 
   async remove(id: string): Promise<void> {
+    if (!id) {
+      throw new Error('ID do cliente nao encontrado para remover.')
+    }
+
+    try {
+      await apiClient.delete(`/customer/${id}`)
+    } catch (error) {
+      return throwApiError(error, 'Nao foi possivel remover o cliente.')
+    }
+
     mockDb.saveClients(mockDb.getClients().filter((item) => resolveClientId(item) !== id))
   },
 }
