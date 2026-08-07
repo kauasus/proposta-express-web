@@ -1,6 +1,8 @@
 import type { AuthResponse, User } from '@/@types'
 import { apiClient } from '@/api/axios'
 import type {
+  AccountDto,
+  AccountSummaryDto,
   LoginRequestDto,
   LoginResponseDto,
   SignupRequestDto,
@@ -38,11 +40,24 @@ export const authService = {
     }
   },
 
-  async register(payload: SignupRequestDto): Promise<void> {
+  async register(payload: SignupRequestDto): Promise<AccountSummaryDto> {
     try {
-      await apiClient.post('/account/signup', payload)
+      const response = await apiClient.post<AccountSummaryDto>(
+        '/account/signup',
+        payload,
+      )
+      return response.data
     } catch (error) {
       return throwApiError(error, 'Não foi possível criar a conta.')
+    }
+  },
+
+  async getById(accountId: string): Promise<AccountDto | null> {
+    try {
+      const response = await apiClient.get<AccountDto>(`/account/${accountId}`)
+      return response.status === 204 ? null : response.data
+    } catch (error) {
+      return throwApiError(error, 'Não foi possível carregar a conta.')
     }
   },
 }

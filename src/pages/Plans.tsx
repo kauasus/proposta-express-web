@@ -56,7 +56,20 @@ export const PlansPage = () => {
                   {plan.name}
                 </CardTitle>
               </CardHeader>
-              <CardContent />
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Código</span>
+                  <span className="font-mono font-semibold">{plan.code}</span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Usuários</span>
+                  <span className="font-semibold">{plan.maxUsers}</span>
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">Propostas</span>
+                  <span className="font-semibold">{plan.maxQuotes}</span>
+                </div>
+              </CardContent>
             </Card>
           ))}
         </div>

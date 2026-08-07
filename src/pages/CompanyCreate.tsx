@@ -7,10 +7,12 @@ import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Building2 } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { companySchema, type CompanyInput } from '@/validators/company.schema'
 
 export const CompanyCreatePage = () => {
+  const [createdCompanyId, setCreatedCompanyId] = useState<string | null>(null)
   const form = useForm<CompanyInput>({
     resolver: zodResolver(companySchema),
     defaultValues: { name: '', identification: '', phone: '', email: '' },
@@ -18,7 +20,8 @@ export const CompanyCreatePage = () => {
 
   const onSubmit = async (data: CompanyInput) => {
     try {
-      await companyService.create(data)
+      const company = await companyService.create(data)
+      setCreatedCompanyId(company.companyId)
       toast.success('Empresa criada com sucesso')
       form.reset()
     } catch (error) {
@@ -91,6 +94,20 @@ export const CompanyCreatePage = () => {
                 {form.formState.isSubmitting ? 'Criando...' : 'Criar empresa'}
               </Button>
             </div>
+
+            {createdCompanyId ? (
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 md:col-span-2">
+                <p className="text-sm font-semibold text-foreground">
+                  ID da empresa criada
+                </p>
+                <p className="mt-1 break-all font-mono text-sm text-primary">
+                  {createdCompanyId}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Use este identificador ao cadastrar as contas da empresa.
+                </p>
+              </div>
+            ) : null}
           </form>
         </CardContent>
       </Card>

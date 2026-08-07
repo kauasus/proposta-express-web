@@ -4,3 +4,7 @@ export interface CreateCompanyRequestDto {
   phone: string
   email: string
 }
+
+export interface CompanyDto extends CreateCompanyRequestDto {
+  companyId: string
+}

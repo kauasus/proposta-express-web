@@ -37,7 +37,7 @@ export interface Client {
   zipCode: string
   address: string
   addressNumber: string
-  createdAt: string
+  createdAt?: string
 }
 
 export interface ProposalItem {

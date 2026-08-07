@@ -13,3 +13,16 @@ export interface CreateCustomerRequestDto {
   state?: string
   country?: string
 }
+
+export type UpdateCustomerRequestDto = Omit<
+  CreateCustomerRequestDto,
+  'companyId'
+>
+
+export interface UpdateCustomerBodyDto {
+  data: UpdateCustomerRequestDto
+}
+
+export interface CustomerDto extends CreateCustomerRequestDto {
+  customerId: string
+}

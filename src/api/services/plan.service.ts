@@ -5,7 +5,7 @@ import { throwApiError } from '@/api/errors'
 export const planService = {
   async list(): Promise<PlanDto[]> {
     try {
-      const response = await apiClient.get<PlanDto[]>('/plans')
+      const response = await apiClient.get<PlanDto[]>('/plans-definition')
       return response.data
     } catch (error) {
       return throwApiError(error, 'Não foi possível carregar os planos.')

@@ -17,3 +17,15 @@ export interface SignupRequestDto {
   confirmPassword: string
   companyId: string
 }
+
+export interface AccountSummaryDto {
+  accountId: string
+  name: string
+  role: string
+}
+
+export interface AccountDto extends AccountSummaryDto {
+  active: string
+  createdAt: string
+  companyId: string
+}

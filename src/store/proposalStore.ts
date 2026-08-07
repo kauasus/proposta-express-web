@@ -11,7 +11,7 @@ interface ProposalState {
   isLoadingClients: boolean
   isLoadingProposals: boolean
   fetchClients: (companyId?: string) => Promise<void>
-  createClient: (payload: ClientInput) => Promise<void>
+  createClient: (payload: ClientInput) => Promise<Client>
   updateClient: (id: string, payload: ClientInput) => Promise<Client>
   removeClient: (id: string) => Promise<void>
   fetchProposals: () => Promise<void>
@@ -30,7 +30,9 @@ export const useProposalStore = create<ProposalState>((set) => ({
   fetchClients: async (companyId?: string) => {
     set({ isLoadingClients: true })
     try {
-      const clients = companyId ? await clientService.listByCompanyId(companyId) : await clientService.list()
+      const clients = companyId
+        ? await clientService.listByCompanyId(companyId)
+        : []
       set({ clients })
     } finally {
       set({ isLoadingClients: false })
@@ -38,9 +40,9 @@ export const useProposalStore = create<ProposalState>((set) => ({
   },
 
   createClient: async (payload) => {
-    await clientService.create(payload)
-    const clients = await clientService.list()
-    set({ clients })
+    const client = await clientService.create(payload)
+    set((state) => ({ clients: [client, ...state.clients] }))
+    return client
   },
 
   updateClient: async (id, payload) => {
@@ -53,8 +55,11 @@ export const useProposalStore = create<ProposalState>((set) => ({
 
   removeClient: async (id) => {
     await clientService.remove(id)
-    const clients = await clientService.list()
-    set({ clients })
+    set((state) => ({
+      clients: state.clients.filter(
+        (client) => (client.customerId ?? client.id) !== id,
+      ),
+    }))
   },
 
   fetchProposals: async () => {
